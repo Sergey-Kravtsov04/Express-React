@@ -16,8 +16,8 @@ const ApplicantSchema = mongoose.Schema(
             require:true,
         },
         avatarUrl:String,
-        major:{
-            type:String
+        major_id:{
+            type:Number
         }
     },
     {

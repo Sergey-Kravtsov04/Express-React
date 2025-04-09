@@ -5,5 +5,5 @@ export const registerValidation = [
     body("email").isEmail(),
     body("password").isLength({min:5}),
     body("avatarUrl").optional().isURL(),
-    body("major").optional()
+    body("major_id").optional()
 ]
