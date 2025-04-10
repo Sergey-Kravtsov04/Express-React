@@ -19,25 +19,43 @@ app.get('/',(req,res)=>{
 });
 
 app.post('/auth/register',registerValidation, async (req,res)=>{
-    const errors = validationResult(req);
+    try{
+        const errors = validationResult(req);
     if(!errors.isEmpty()){
         return res.status(400).json(errors.array());
     }
 
     const password = req.body.password;
     const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password,salt)
+    const hash = await bcrypt.hash(password,salt)
 
     const doc = new ApplicantModel({
         fullName:req.body.fullName,
         email:req.body.email,
-        passwordHash,
+        passwordHash: hash,
         avatarUrl:req.body.avatarUrl,
         major_id:req.body.major_id
     })
 
     const user = await doc.save()
-    res.json(user)
+
+    const token = jwt.sign({
+        _id:user._id
+    },'secretkey',{expiresIn:"90d"})
+
+    const {passwordHash,...userData} = user._doc
+    res.json({
+        userData,
+        token
+    })
+
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({
+            message:"Не удалось зарегистрироваться"
+        })
+    }
 });
 
 app.listen(4444,(err)=>{
