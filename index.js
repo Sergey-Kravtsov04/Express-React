@@ -6,7 +6,8 @@ import { validationResult } from "express-validator";
 import { registerValidation } from "./validations/auth.js";
 import ApplicantModel from "./models/Applicant.js";
 
-mongoose.connect('mongodb+srv://admin:qqqqqq@cluster0.0vyfzlo.mongodb.net/AdmissionsCommittee?retryWrites=true&w=majority&appName=Cluster0')
+// mongoose.connect('mongodb+srv://admin:qqqqqq@cluster0.0vyfzlo.mongodb.net/AdmissionsCommittee?retryWrites=true&w=majority&appName=Cluster0')
+    mongoose.connect('mongodb+srv://admin:qqqqqq@cluster0.0vyfzlo.mongodb.net/AdmissionsCommittee?retryWrites=true&w=majority&appName=Cluster0')
     .then(() => console.log('DB ok'))
     .catch((err) => console.error(err))
 
@@ -16,6 +17,33 @@ app.use(express.json());
 
 app.get('/',(req,res)=>{
     res.send('Hello, world!!!&')
+});
+
+app.post('/auth/login', async (req,res)=>{
+    try{
+        const user = await ApplicantModel.findOne({email:req.body.email});
+        if(!user){
+            return res.status(404).json({message:'Не удалось найти пользователя'})
+        }
+        const isValidPass = await bcrypt.compare(req.body.password,user._doc.passwordHash)
+        if(!isValidPass){
+            return res.status(400).json({message:'Неверный логин или пароль'})
+        }
+
+        const token = jwt.sign({_id: user._id},'secretkey',{expiresIn:'90d'});
+        const {passwordHash, ...userData} = user._doc
+
+        res.status(200).json({
+            ...userData,
+            token:token
+        })
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({
+            message:"Не удалось зарегистрироваться"
+        })
+    }
 });
 
 app.post('/auth/register',registerValidation, async (req,res)=>{
@@ -39,9 +67,7 @@ app.post('/auth/register',registerValidation, async (req,res)=>{
 
     const user = await doc.save()
 
-    const token = jwt.sign({
-        _id:user._id
-    },'secretkey',{expiresIn:"90d"})
+    const token = jwt.sign({_id:user._id},'secretkey',{expiresIn:"90d"})
 
     const {passwordHash,...userData} = user._doc
     res.json({
