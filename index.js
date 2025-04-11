@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import { validationResult } from "express-validator";
 import { registerValidation } from "./validations/auth.js";
 import ApplicantModel from "./models/Applicant.js";
+import checkAuth from "./utils/checkAuth.js";
 
 // mongoose.connect('mongodb+srv://admin:qqqqqq@cluster0.0vyfzlo.mongodb.net/AdmissionsCommittee?retryWrites=true&w=majority&appName=Cluster0')
     mongoose.connect('mongodb+srv://admin:qqqqqq@cluster0.0vyfzlo.mongodb.net/AdmissionsCommittee?retryWrites=true&w=majority&appName=Cluster0')
@@ -45,7 +46,28 @@ app.post('/auth/login', async (req,res)=>{
         })
     }
 });
+app.get('/auth/me',checkAuth,async(req,res)=>{
+ try{
+    const user = await ApplicantModel.findById(req.userId);
 
+    if(!user){
+        return res.status(404).json({
+            message:"Пользователь не найден"
+        })
+    }
+    const {passwordHash, ...userData} = user._doc
+
+        res.status(200).json({
+            ...userData
+        })
+ }
+ catch(err){
+    console.log(err);
+    res.status(500).json({
+        message:"Нет доступа"
+    })
+ }   
+});
 app.post('/auth/register',registerValidation, async (req,res)=>{
     try{
         const errors = validationResult(req);
