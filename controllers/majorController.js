@@ -32,6 +32,7 @@ export const getAll = async (req,res)=>{
         });
     }
 }
+
 export const getOne = async (req,res)=>{
     try{
         //const major = await MajorModel.findOne({_id:req.params.id}); // NoSQL
@@ -53,6 +54,7 @@ export const getOne = async (req,res)=>{
         });
     }
 }
+
 export const remove = (req,res) =>{
     try{
         MajorModel.findOneAndDelete({_id:req.params.id})
