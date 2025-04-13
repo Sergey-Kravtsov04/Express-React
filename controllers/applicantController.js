@@ -56,31 +56,31 @@ export const getMe = async(req,res)=>{
 export const register = async (req,res)=>{
     try{
         const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        return res.status(400).json(errors.array());
-    }
+        if(!errors.isEmpty()){
+            return res.status(400).json(errors.array());
+        }
 
-    const password = req.body.password;
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password,salt)
+        const password = req.body.password;
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password,salt)
 
-    const doc = new ApplicantModel({
-        fullName:req.body.fullName,
-        email:req.body.email,
-        passwordHash: hash,
-        avatarUrl:req.body.avatarUrl,
-        major_id:req.body.major_id
-    })
+        const doc = new ApplicantModel({
+            fullName:req.body.fullName,
+            email:req.body.email,
+            passwordHash: hash,
+            avatarUrl:req.body.avatarUrl,
+            major:req.body.major
+        })
 
-    const applicant = await doc.save()
+        const applicant = await doc.save()
 
-    const token = jwt.sign({_id:applicant._id},'secretkey',{expiresIn:"90d"})
+        const token = jwt.sign({_id:applicant._id},'secretkey',{expiresIn:"90d"})
 
-    const {passwordHash,...applicantData} = applicant._doc
-    res.json({
-        applicantData: applicantData,
-        token
-    })
+        const {passwordHash,...applicantData} = applicant._doc
+        res.json({
+            applicantData: applicantData,
+            token
+        })
 
     }
     catch(err){

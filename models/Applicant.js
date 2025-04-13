@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+const schema = mongoose.Schema;
+
 const ApplicantSchema = mongoose.Schema(
     {
         fullName:{
@@ -16,8 +18,9 @@ const ApplicantSchema = mongoose.Schema(
             require:true,
         },
         avatarUrl:String,
-        major_id:{
-            type:Number
+        major:{
+            type: schema.Types.ObjectId,
+            ref:"Major",
         }
     },
     {
