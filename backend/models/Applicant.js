@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-const schema = mongoose.Schema;
 
 const ApplicantSchema = mongoose.Schema(
     {
@@ -19,8 +18,8 @@ const ApplicantSchema = mongoose.Schema(
         },
         avatarUrl:String,
         major:{
-            type: schema.Types.ObjectId,
-            ref:"Major",
+            type: mongoose.Schema.Types.ObjectId,
+            ref:'Major'
         }
     },
     {

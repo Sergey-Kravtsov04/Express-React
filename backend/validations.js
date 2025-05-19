@@ -4,12 +4,11 @@ export const registerValidation = [
     body("fullName").isLength({min:3}),
     body("email").isEmail(),
     body("password").isLength({min:5}),
+    // body("major").optional().isMongoId(),
     body("avatarUrl").optional().isURL(),
-    body("major_id").optional()
 ]
 
 export const loginValidation = [
-    body("fullName").isLength({min:3}),
     body("email").isEmail(),
 ]
 
